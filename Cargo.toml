@@ -1,0 +1,12 @@
+[package]
+name = "comrak"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+name = "comrak"
+crate-type = ["cdylib"]
+
+[dependencies]
+comrak_lib = { package = "comrak", version = "0.35.0" }
+pyo3 = "0.23.3"
