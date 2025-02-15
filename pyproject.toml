@@ -24,6 +24,7 @@ classifiers = [
 dynamic = [
   "version"
 ]
+license = {file = "LICENSE"}
 authors = [
   {email = "louismmx@gmail.com", name = "Louis Maddox"}
 ]
@@ -38,9 +39,6 @@ keywords = [
 readme = "README.md"
 requires-python = ">=3.9"
 version = "0.0.2"
-
-[project.license]
-text = "MIT"
 
 [project.optional-dependencies]
 dev = [
