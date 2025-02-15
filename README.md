@@ -24,6 +24,13 @@ pip install comrak
 
 Fast Markdown to HTML parser in Rust, shipped for Python via PyO3.
 
+## Benchmarks
+
+Tested with small (8 lines) and medium (1200 lines) markdown strings
+
+- vs. [markdown](https://pypi.org/project/markdown): 15x faster (S/M)
+- vs. [markdown2](https://pypi.org/project/markdown2): 20x (S) - 60x (M) faster
+
 ## Contributing
 
 Maintained by [lmmx](https://github.com/lmmx). Contributions welcome!
