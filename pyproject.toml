@@ -4,17 +4,48 @@ build-backend = "maturin"
 
 [project]
 name = "comrak"
-requires-python = ">=3.8"
+description = "Python bindings for the Comrak Rust library, a fast CommonMark/GFM parser"
 classifiers = [
-    "Programming Language :: Rust",
-    "Programming Language :: Python :: Implementation :: CPython",
-    "Programming Language :: Python :: Implementation :: PyPy",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Rust",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.9"
 ]
 dynamic = ["version"]
+authors = [
+  {email = "louismmx@gmail.com", name = "Louis Maddox"}
+]
+keywords = [
+  "markdown",
+  "html",
+  "rust",
+  "commonmark",
+  "gfm",
+  "parser"
+]
+license = {text = "MIT"}
+readme = "README.md"
+requires-python = ">=3.9"
+version = "0.0.1"
 
 [project.optional-dependencies]
 dev = [
-    "maturin[patchelf]>=1.8.2",
+  "maturin[patchelf]>=1.8.2",
+  "pre-commit>=4.1.0"
 ]
+
+[project.urls]
+# Documentation = "https://comrak.vercel.app/"
+Homepage = "https://github.com/lmmx/comrak"
+Repository = "https://github.com/lmmx/comrak.git"
+
 [tool.maturin]
 features = ["pyo3/extension-module"]
