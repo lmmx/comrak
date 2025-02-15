@@ -3,7 +3,7 @@ import markdown2
 MARKDOWN_TEXT = """
 # Example
 
-This is **bold** text with [a link](https://example.com). 
+This is **bold** text with [a link](https://example.com).
 And some list:
 - item1
 - item2
