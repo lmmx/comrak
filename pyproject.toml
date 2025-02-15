@@ -41,6 +41,10 @@ dev = [
   "maturin[patchelf]>=1.8.2",
   "pre-commit>=4.1.0"
 ]
+bench = [
+    "markdown>=3.7",
+    "markdown2>=2.5.3",
+]
 
 [project.urls]
 # Documentation = "https://comrak.vercel.app/"
