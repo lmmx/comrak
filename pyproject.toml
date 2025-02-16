@@ -44,7 +44,7 @@ dev = [
   "maturin[patchelf]>=1.8.2",
   "pdm>=2.22.3",
   "pdm-bump>=0.9.10",
-  "pre-commit>=4.1.0",
+  "pre-commit>=4.1.0"
 ]
 bench = [
   "markdown>=3.7",
