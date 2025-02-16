@@ -59,4 +59,4 @@ Maintained by [lmmx](https://github.com/lmmx). Contributions welcome!
 
 ## License
 
-This project is licensed under the [MIT License](https://opensource.org/licenses/MIT).
+Licensed under the 2-Clause BSD License. See [LICENSE](https://github.com/lmmx/comrak/blob/master/LICENSE) for all the details.
