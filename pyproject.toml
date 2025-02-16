@@ -34,7 +34,7 @@ keywords = [
 ]
 readme = "README.md"
 requires-python = ">=3.9"
-version = "0.0.4"
+version = "0.0.5"
 
 [project.license]
 file = "LICENSE"
@@ -42,7 +42,9 @@ file = "LICENSE"
 [project.optional-dependencies]
 dev = [
   "maturin[patchelf]>=1.8.2",
-  "pre-commit>=4.1.0"
+  "pdm>=2.22.3",
+  "pdm-bump>=0.9.10",
+  "pre-commit>=4.1.0",
 ]
 bench = [
   "markdown>=3.7",
