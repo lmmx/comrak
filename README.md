@@ -38,6 +38,8 @@ All options are exposed in a simple manner:
 '<p>foo 😄</p>\n'
 ```
 
+Refer to the [Comrak docs](https://docs.rs/comrak/latest/comrak/struct.Options.html) for all available options.
+
 ## Benchmarks
 
 Tested with small (8 lines) and medium (1200 lines) markdown strings
