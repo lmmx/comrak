@@ -24,6 +24,20 @@ pip install comrak
 
 Fast Markdown to HTML parser in Rust, shipped for Python via PyO3.
 
+### Options
+
+All options are exposed in a simple manner:
+
+```py
+>>> import comrak
+>>> opts = comrak.ExtensionOptions()
+>>> comrak.render_markdown("foo :smile:", extension_options=opts)
+'<p>foo :smile:</p>\n'
+>>> opts.shortcodes = True
+>>> comrak.render_markdown("foo :smile:", extension_options=opts)
+'<p>foo 😄</p>\n'
+```
+
 ## Benchmarks
 
 Tested with small (8 lines) and medium (1200 lines) markdown strings
