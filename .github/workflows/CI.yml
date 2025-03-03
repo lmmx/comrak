@@ -11,7 +11,7 @@ on:
       - main
       - master
     tags:
-      - '*'
+      - "*"
   pull_request:
   workflow_dispatch:
 
@@ -27,7 +27,7 @@ jobs:
           - runner: ubuntu-22.04
             target: x86_64
           - runner: ubuntu-22.04
-            target: x86
+            target: i686-unknown-linux-gnu
           - runner: ubuntu-22.04
             target: aarch64
           - runner: ubuntu-22.04
@@ -42,7 +42,8 @@ jobs:
         with:
           python-version: 3.x
       - name: Build wheels
-        uses: PyO3/maturin-action@v1
+        # uses: PyO3/maturin-action@v1.47.1
+        uses: PyO3/maturin-action@refs/pull/330/head
         with:
           target: ${{ matrix.platform.target }}
           args: --release --out dist --find-interpreter
@@ -62,7 +63,7 @@ jobs:
           - runner: ubuntu-22.04
             target: x86_64
           - runner: ubuntu-22.04
-            target: x86
+            target: i686
           - runner: ubuntu-22.04
             target: aarch64
           - runner: ubuntu-22.04
@@ -170,7 +171,7 @@ jobs:
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-path: 'wheels-*/*'
+          subject-path: "wheels-*/*"
       - name: Publish to PyPI
         if: ${{ startsWith(github.ref, 'refs/tags/') }}
         uses: PyO3/maturin-action@v1
