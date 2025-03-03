@@ -42,7 +42,7 @@ jobs:
         with:
           python-version: 3.x
       - name: Build wheels
-        # uses: PyO3/maturin-action@v1 ...
+        # uses: PyO3/maturin-action@v1 ...?
         uses: lmmx/maturin-action@main
         with:
           target: ${{ matrix.platform.target }}
