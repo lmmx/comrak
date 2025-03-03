@@ -26,22 +26,16 @@ jobs:
         platform:
           - runner: ubuntu-22.04
             target: x86_64
-            before: ""
           - runner: ubuntu-22.04
-            target: x86
-            before: "apt-get update && apt-get install -y libatomic libatomic.i686"
+            target: i686
           - runner: ubuntu-22.04
             target: aarch64
-            before: ""
           - runner: ubuntu-22.04
             target: armv7
-            before: ""
           - runner: ubuntu-22.04
             target: s390x
-            before: ""
           - runner: ubuntu-22.04
             target: ppc64le
-            before: ""
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -54,8 +48,6 @@ jobs:
           args: --release --out dist --find-interpreter
           sccache: ${{ !startsWith(github.ref, 'refs/tags/') }}
           manylinux: auto
-          before-script-linux: |
-            ${{ matrix.platform.before }}
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
@@ -70,7 +62,7 @@ jobs:
           - runner: ubuntu-22.04
             target: x86_64
           - runner: ubuntu-22.04
-            target: x86
+            target: i686
           - runner: ubuntu-22.04
             target: aarch64
           - runner: ubuntu-22.04
