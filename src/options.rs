@@ -52,6 +52,8 @@ pub struct PyExtensionOptions {
     pub spoiler: bool,
     #[pyo3(get, set)]
     pub greentext: bool,
+    #[pyo3(get, set)]
+    pub cjk_friendly_emphasis: bool,
 }
 
 impl PyExtensionOptions {
@@ -78,6 +80,7 @@ impl PyExtensionOptions {
         opts.subscript = self.subscript;
         opts.spoiler = self.spoiler;
         opts.greentext = self.greentext;
+        opts.cjk_friendly_emphasis = self.cjk_friendly_emphasis;
     }
 }
 
@@ -108,6 +111,7 @@ impl PyExtensionOptions {
             subscript: defaults.subscript,
             spoiler: defaults.spoiler,
             greentext: defaults.greentext,
+            cjk_friendly_emphasis: defaults.cjk_friendly_emphasis,
         }
     }
 }
@@ -171,8 +175,6 @@ pub struct PyRenderOptions {
     #[pyo3(get, set)]
     pub sourcepos: bool,
     #[pyo3(get, set)]
-    pub experimental_inline_sourcepos: bool,
-    #[pyo3(get, set)]
     pub escaped_char_spans: bool,
     #[pyo3(get, set)]
     pub ignore_setext: bool,
@@ -188,6 +190,8 @@ pub struct PyRenderOptions {
     pub tasklist_classes: bool,
     #[pyo3(get, set)]
     pub ol_width: usize,
+    #[pyo3(get, set)]
+    pub experimental_minimize_commonmark: bool,
 }
 
 impl PyRenderOptions {
@@ -206,7 +210,6 @@ impl PyRenderOptions {
             _ => ListStyleType::Dash,  // '-'
         };
         opts.sourcepos = self.sourcepos;
-        opts.experimental_inline_sourcepos = self.experimental_inline_sourcepos;
         opts.escaped_char_spans = self.escaped_char_spans;
         opts.ignore_setext = self.ignore_setext;
         opts.ignore_empty_links = self.ignore_empty_links;
@@ -215,6 +218,7 @@ impl PyRenderOptions {
         opts.figure_with_caption = self.figure_with_caption;
         opts.tasklist_classes = self.tasklist_classes;
         opts.ol_width = self.ol_width;
+        opts.experimental_minimize_commonmark = self.experimental_minimize_commonmark;
     }
 }
 
@@ -232,7 +236,6 @@ impl PyRenderOptions {
             escape: defaults.escape,
             list_style: defaults.list_style as u8, // 45 if dash
             sourcepos: defaults.sourcepos,
-            experimental_inline_sourcepos: defaults.experimental_inline_sourcepos,
             escaped_char_spans: defaults.escaped_char_spans,
             ignore_setext: defaults.ignore_setext,
             ignore_empty_links: defaults.ignore_empty_links,
@@ -241,6 +244,7 @@ impl PyRenderOptions {
             figure_with_caption: defaults.figure_with_caption,
             tasklist_classes: defaults.tasklist_classes,
             ol_width: defaults.ol_width,
+            experimental_minimize_commonmark: defaults.experimental_minimize_commonmark,
         }
     }
 }
