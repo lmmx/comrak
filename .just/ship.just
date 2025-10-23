@@ -35,14 +35,5 @@ release bump_level="patch":
     # 🚀 Push the release commit to $branch_name
     git push origin $branch_name
 
-    # 🚀 Push the commit tag to the remote
+    # 🚀 Push the commit tag to the remote (will trigger PyPI release via Trusted Publishing)
     git push origin "py-$new_version"
-
-ship-wheels *dl_args:
-  mkdir -p dist
-  rm -rf dist/*
-  gh run download -p wheel* {{dl_args}}
-  mv wheel*/* dist/
-  rm -rf wheel*
-  just publish --no-build
-  rm -rf dist/*
