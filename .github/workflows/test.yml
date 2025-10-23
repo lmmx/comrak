@@ -26,9 +26,12 @@ jobs:
       - name: Get Python versions from uv
         id: get-versions
         run: |
-          versions=$(uv python list --all-versions --output-format json | jq -c '[.[]
-            | {v:.version_parts, t:.variant}]
+          MIN_VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.requires-python | sed 's/>=//;s/"//g')
+          versions=$(uv python list --all-versions --output-format json | jq -c --arg min "$MIN_VERSION" '
+            ($min | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $minv |
+            [.[] | {v:.version_parts, t:.variant}]
             | unique_by([.v.minor,.t])
+            | map(select(.v.major > $minv.major or (.v.major == $minv.major and .v.minor >= $minv.minor)))
             | map("\(.v.major).\(.v.minor)\(if .t=="freethreaded" then "t" else "" end)")')
           echo "python-versions=$versions" >> $GITHUB_OUTPUT
 
