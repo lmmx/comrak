@@ -4,6 +4,24 @@ requires = [
 ]
 build-backend = "maturin"
 
+[dependency-groups]
+bench = [
+  "markdown>=3.7",
+  "markdown2>=2.5.3"
+]
+build = ["maturin>=1.9.3", "patchelf>=0.17.2.4"]
+dev = [
+  "maturin[patchelf]>=1.9.3",
+  "pdbpp>=0.11.7",
+  "pdm>=2.22.3",
+  "pre-commit>=4.1.0"
+]
+test = [
+  "pillow<=11.0.0",
+  "pytest-benchmark<=5.0.0",
+  "pytest<=8.4.0"
+]
+
 [project]
 name = "comrak"
 description = "Python bindings for the Comrak Rust library, a fast CommonMark/GFM parser"
@@ -40,18 +58,6 @@ version = "0.0.7"
 [project.license]
 file = "LICENSE"
 
-[project.optional-dependencies]
-dev = [
-  "maturin[patchelf]>=1.8.2",
-  "pdm>=2.22.3",
-  "pdm-bump>=0.9.10",
-  "pre-commit>=4.1.0"
-]
-bench = [
-  "markdown>=3.7",
-  "markdown2>=2.5.3"
-]
-
 [project.urls]
 Homepage = "https://github.com/lmmx/comrak"
 Repository = "https://github.com/lmmx/comrak.git"
@@ -60,3 +66,8 @@ Repository = "https://github.com/lmmx/comrak.git"
 features = [
   "pyo3/extension-module"
 ]
+
+[tool.uv]
+# Build Rust code in development mode (faster builds)
+# config-settings = { build-args = "--profile=dev" }
+default-groups = ["build", "dev", "test"]
