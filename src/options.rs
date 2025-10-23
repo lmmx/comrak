@@ -1,9 +1,9 @@
 use pyo3::prelude::*;
 
 // Import the Comrak (Rust) types under `comrak_lib::`
-use comrak_lib::{
-    ExtensionOptions as ComrakExtensionOptions, ListStyleType, ParseOptions as ComrakParseOptions,
-    RenderOptions as ComrakRenderOptions,
+use comrak_lib::options::{
+    Extension as ComrakExtensionOptions, ListStyleType, Parse as ComrakParseOptions,
+    Render as ComrakRenderOptions,
 };
 
 /// Python class that mirrors Comrak’s `ExtensionOptions`
@@ -124,6 +124,8 @@ pub struct PyParseOptions {
     pub relaxed_tasklist_matching: bool,
     #[pyo3(get, set)]
     pub relaxed_autolinks: bool,
+    #[pyo3(get, set)]
+    pub ignore_setext: bool,
 }
 
 impl PyParseOptions {
@@ -133,6 +135,7 @@ impl PyParseOptions {
         opts.default_info_string = self.default_info_string.clone();
         opts.relaxed_tasklist_matching = self.relaxed_tasklist_matching;
         opts.relaxed_autolinks = self.relaxed_autolinks;
+        opts.ignore_setext = self.ignore_setext;
     }
 }
 
@@ -146,6 +149,7 @@ impl PyParseOptions {
             default_info_string: defaults.default_info_string.clone(),
             relaxed_tasklist_matching: defaults.relaxed_tasklist_matching,
             relaxed_autolinks: defaults.relaxed_autolinks,
+            ignore_setext: defaults.ignore_setext,
         }
     }
 }
@@ -171,11 +175,7 @@ pub struct PyRenderOptions {
     #[pyo3(get, set)]
     pub sourcepos: bool,
     #[pyo3(get, set)]
-    pub experimental_inline_sourcepos: bool,
-    #[pyo3(get, set)]
     pub escaped_char_spans: bool,
-    #[pyo3(get, set)]
-    pub ignore_setext: bool,
     #[pyo3(get, set)]
     pub ignore_empty_links: bool,
     #[pyo3(get, set)]
@@ -197,7 +197,7 @@ impl PyRenderOptions {
         opts.github_pre_lang = self.github_pre_lang;
         opts.full_info_string = self.full_info_string;
         opts.width = self.width;
-        opts.unsafe_ = self.unsafe_;
+        opts.r#unsafe = self.unsafe_;
         opts.escape = self.escape;
         // convert integer to ListStyleType
         opts.list_style = match self.list_style {
@@ -206,9 +206,7 @@ impl PyRenderOptions {
             _ => ListStyleType::Dash,  // '-'
         };
         opts.sourcepos = self.sourcepos;
-        opts.experimental_inline_sourcepos = self.experimental_inline_sourcepos;
         opts.escaped_char_spans = self.escaped_char_spans;
-        opts.ignore_setext = self.ignore_setext;
         opts.ignore_empty_links = self.ignore_empty_links;
         opts.gfm_quirks = self.gfm_quirks;
         opts.prefer_fenced = self.prefer_fenced;
@@ -228,13 +226,11 @@ impl PyRenderOptions {
             github_pre_lang: defaults.github_pre_lang,
             full_info_string: defaults.full_info_string,
             width: defaults.width,
-            unsafe_: defaults.unsafe_,
+            unsafe_: defaults.r#unsafe,
             escape: defaults.escape,
             list_style: defaults.list_style as u8, // 45 if dash
             sourcepos: defaults.sourcepos,
-            experimental_inline_sourcepos: defaults.experimental_inline_sourcepos,
             escaped_char_spans: defaults.escaped_char_spans,
-            ignore_setext: defaults.ignore_setext,
             ignore_empty_links: defaults.ignore_empty_links,
             gfm_quirks: defaults.gfm_quirks,
             prefer_fenced: defaults.prefer_fenced,

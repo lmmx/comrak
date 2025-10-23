@@ -27,6 +27,7 @@ repos:
     rev: v0.24.3
     hooks:
       - id: toml-sort-fix
+        exclude: ^Cargo.lock$
   - repo: https://github.com/asottile/add-trailing-comma
     rev: v4.0.0
     hooks:
