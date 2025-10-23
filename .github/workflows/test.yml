@@ -1,0 +1,66 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  get-python-versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      python-versions: ${{ steps.get-versions.outputs.python-versions }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+
+      - name: Get Python versions from uv
+        id: get-versions
+        run: |
+          versions=$(uv python list --all-versions --output-format json | jq -c '[.[]
+            | {v:.version_parts, t:.variant}]
+            | unique_by([.v.minor,.t])
+            | map("\(.v.major).\(.v.minor)\(if .t=="freethreaded" then "t" else "" end)")')
+          echo "python-versions=$versions" >> $GITHUB_OUTPUT
+
+  test:
+    needs: get-python-versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      matrix:
+        python-version: ${{ fromJson(needs.get-python-versions.outputs.python-versions) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up mold linker
+        uses: rui314/setup-mold@v1
+
+      - uses: Swatinem/rust-cache@v2.8.1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          enable-cache: true
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Sync build and test dependencies
+        run: uv sync --no-install-project --only-group build --only-group test
+
+      - name: Build extension
+        run: $(uv python find) -m maturin develop --uv
+
+      - name: Run tests
+        run: $(uv python find) -m pytest tests/ -v
