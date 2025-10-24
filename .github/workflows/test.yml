@@ -61,10 +61,7 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
 
       - name: Sync build and test dependencies
-        run: uv sync --no-install-project --only-group build --only-group test
-
-      - name: Build extension
-        run: $(uv python find) -m maturin develop --uv
+        run: uv sync --only-group build --only-group test
 
       - name: Run tests
         run: $(uv python find) -m pytest tests/ -v
