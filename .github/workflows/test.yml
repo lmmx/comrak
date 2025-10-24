@@ -65,9 +65,8 @@ jobs:
 
       - name: Build extension
         run: |
-          VENV_PYTHON=$(uv python find --directory .venv)
-          echo "VENV_PYTHON: $VENV_PYTHON"
-          $VENV_PYTHON -m maturin develop --uv
+          source .venv/bin/activate
+          .venv/bin/maturin develop --uv
 
       - name: Run tests
         run: $(uv python find) -m pytest tests/ -v
