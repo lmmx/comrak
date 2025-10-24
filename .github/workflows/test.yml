@@ -77,10 +77,12 @@ jobs:
 
       - name: Build extension
         run: |
-          source .venv/bin/activate
-          .venv/bin/maturin develop --uv
+          # https://github.com/astral-sh/uv/issues/16434
+          # $(uv python find) -m maturin develop --uv
+          .venv/bin/python -m maturin develop --uv
 
       - name: Run tests
         run: |
-          source .venv/bin/activate
-          .venv/bin/pytest tests/ -v
+          # https://github.com/astral-sh/uv/issues/16434
+          # $(uv python find) -m pytest
+          .venv/bin/pytest
