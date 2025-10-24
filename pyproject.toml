@@ -69,6 +69,9 @@ features = [
 testpaths = "tests"
 addopts = "-v"
 
+[tool.ruff]
+extend-select = ["F", "UP"]
+
 [tool.uv]
 # Build Rust code in development mode (faster builds)
 # config-settings = { build-args = "--profile=dev" }

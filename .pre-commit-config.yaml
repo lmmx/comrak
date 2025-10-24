@@ -23,25 +23,11 @@ repos:
       - id: end-of-file-fixer
       - id: name-tests-test
       - id: trailing-whitespace
-  - repo: https://github.com/pappasam/toml-sort
-    rev: v0.24.3
-    hooks:
-      - id: toml-sort-fix
-        exclude: ^Cargo.lock$
-  - repo: https://github.com/asottile/add-trailing-comma
-    rev: v4.0.0
-    hooks:
-      - id: add-trailing-comma
-  - repo: https://github.com/asottile/pyupgrade
-    rev: v3.21.0
-    hooks:
-      - id: pyupgrade
-        args: [--py310-plus]
   - repo: https://github.com/astral-sh/ruff-pre-commit
     rev: v0.14.1
     hooks:
       # Run the linter
-      - id: ruff
+      - id: ruff-check
         args: [--fix]
       # Run the formatter
       - id: ruff-format
