@@ -63,5 +63,8 @@ jobs:
       - name: Sync build and test dependencies
         run: uv sync --only-group build --only-group test
 
+      - name: Build extension
+        run: maturin develop --uv
+
       - name: Run tests
         run: $(uv python find) -m pytest tests/ -v
