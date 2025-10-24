@@ -78,7 +78,10 @@ jobs:
       - name: Build extension
         run: |
           source .venv/bin/activate
-          $(uv python find -vv) maturin develop --uv
+          echo "-- uv python find VERBOSE DEBUG"
+          uv python find -vv
+          echo "-- END OF uv python find DEBUG"
+          $(uv python find) -m maturin develop --uv
 
       - name: Run tests
         run: |
