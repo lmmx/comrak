@@ -25,7 +25,7 @@ jobs:
       - name: Install just
         uses: taiki-e/install-action@64adfd9e935fa438859b9e080fd026720b2ba070 # tag=just
         with:
-          tool: just@1.38.0
+          tool: just@1.38.0,echo-comment@0.2.0
 
       - name: Configure git identity
         run: |
