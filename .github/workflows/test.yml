@@ -7,9 +7,9 @@ on:
   pull_request:
   workflow_dispatch:
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
-  cancel-in-progress: false # true
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+#   cancel-in-progress: false # true
 
 jobs:
   get-python-versions:
