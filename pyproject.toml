@@ -17,9 +17,7 @@ dev = [
   "pre-commit>=4.1.0"
 ]
 test = [
-  "pillow<=11.0.0",
-  "pytest-benchmark<=5.0.0",
-  "pytest<=8.4.0"
+  "pytest>=8.4.0"
 ]
 
 [project]
