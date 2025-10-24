@@ -64,7 +64,10 @@ jobs:
         run: uv sync --only-group build --only-group test
 
       - name: Build extension
-        run: $(uv python find) -m maturin develop --uv
+        run: |
+          VENV_PYTHON=$(uv python find --directory .venv)
+          echo "VENV_PYTHON: $VENV_PYTHON"
+          $VENV_PYTHON -m maturin develop --uv
 
       - name: Run tests
         run: $(uv python find) -m pytest tests/ -v
