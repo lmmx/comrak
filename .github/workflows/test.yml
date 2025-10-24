@@ -77,7 +77,7 @@ jobs:
 
       - name: Build extension
         run: |
-          source .venv/bin/activate
+          # source .venv/bin/activate
           echo "-- uv python find VERBOSE DEBUG"
           uv python find -vv
           echo "-- END OF uv python find DEBUG"
