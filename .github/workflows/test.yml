@@ -77,13 +77,12 @@ jobs:
 
       - name: Build extension
         run: |
-          # source .venv/bin/activate
-          echo "-- uv python find VERBOSE DEBUG"
-          uv python find -vv
-          echo "-- END OF uv python find DEBUG"
-          $(uv python find) -m maturin develop --uv
+          # https://github.com/astral-sh/uv/issues/16434
+          # $(uv python find) -m maturin develop --uv
+          .venv/bin/python -m maturin develop --uv
 
       - name: Run tests
         run: |
-          source .venv/bin/activate
-          .venv/bin/pytest tests/ -v
+          # https://github.com/astral-sh/uv/issues/16434
+          # $(uv python find) -m pytest
+          .venv/bin/pytest

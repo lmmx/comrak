@@ -65,6 +65,10 @@ features = [
   "pyo3/extension-module"
 ]
 
+[tool.pytest.ini_options]
+testpaths = "tests"
+addopts = "-v"
+
 [tool.uv]
 # Build Rust code in development mode (faster builds)
 # config-settings = { build-args = "--profile=dev" }
