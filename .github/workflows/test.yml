@@ -1,0 +1,86 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+
+jobs:
+  get-python-versions:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      python-versions: ${{ steps.get-versions.outputs.python-versions }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+
+      - name: Get Python versions from uv
+        id: get-versions
+        run: |
+          set -euo pipefail
+          MIN_VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.requires-python | sed 's/>=//;s/"//g')
+          PYO3_FFI_VERSION=$(grep -m 1 -A 1 'name = "pyo3-ffi"' Cargo.lock | tail -n1 | cut -d '"' -f 2)
+          MAX_VERSION=$(
+            curl -sL "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-$PYO3_FFI_VERSION.crate" \
+            | tar -xzO "pyo3-ffi-$PYO3_FFI_VERSION/Cargo.toml" \
+            | uvx --from=toml-cli toml get --toml-path=/dev/stdin package.metadata.cpython.max-version \
+            | tr -d '"'
+          )
+          versions=$(uv python list --all-versions --output-format json | jq -c --arg min "$MIN_VERSION" --arg max "$MAX_VERSION" '
+            ($min | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $minv |
+            ($max | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $maxv |
+            [.[] | {v:.version_parts, t:.variant}]
+            | unique_by([.v.minor,.t])
+            | map(select(
+                (.v.major > $minv.major or (.v.major == $minv.major and .v.minor >= $minv.minor)) and
+                (.v.major < $maxv.major or (.v.major == $maxv.major and .v.minor <= $maxv.minor))
+              ))
+            | map("\(.v.major).\(.v.minor)\(if .t=="freethreaded" then "t" else "" end)")')
+          echo "python-versions=$versions" >> $GITHUB_OUTPUT
+
+  test:
+    needs: get-python-versions
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ${{ fromJson(needs.get-python-versions.outputs.python-versions) }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up mold linker
+        uses: rui314/setup-mold@v1
+
+      - uses: Swatinem/rust-cache@v2.8.1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false # true
+          python-version: ${{ matrix.python-version }}
+
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Sync build and test dependencies
+        run: uv sync --only-group build --only-group test
+
+      - name: Build extension
+        run: |
+          source .venv/bin/activate
+          .venv/bin/maturin develop --uv
+
+      - name: Run tests
+        run: |
+          source .venv/bin/activate
+          .venv/bin/pytest tests/ -v

@@ -1,6 +1,6 @@
 [build-system]
 requires = [
-  "maturin>=1.8,<2.0"
+  "maturin>=1.9.6,<2.0"
 ]
 build-backend = "maturin"
 
@@ -9,17 +9,15 @@ bench = [
   "markdown>=3.7",
   "markdown2>=2.5.3"
 ]
-build = ["maturin>=1.9.3", "patchelf>=0.17.2.4"]
+build = ["maturin>=1.9.6", "patchelf>=0.17.2.4"]
 dev = [
-  "maturin[patchelf]>=1.9.3",
+  "maturin[patchelf]>=1.9.6",
   "pdbpp>=0.11.7",
   "pdm>=2.22.3",
   "pre-commit>=4.1.0"
 ]
 test = [
-  "pillow<=11.0.0",
-  "pytest-benchmark<=5.0.0",
-  "pytest<=8.4.0"
+  "pytest>=8.4.0"
 ]
 
 [project]
