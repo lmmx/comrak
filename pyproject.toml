@@ -51,7 +51,7 @@ keywords = [
 ]
 readme = "README.md"
 requires-python = ">=3.9"
-version = "0.0.7"
+version = "0.0.8"
 
 [project.license]
 file = "LICENSE"
