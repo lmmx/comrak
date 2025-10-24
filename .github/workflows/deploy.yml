@@ -17,6 +17,11 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
+      - name: Install uv
+        uses: astral-sh/setup-uv@v7
+        with:
+          enable-cache: false
+
       - name: Install just
         uses: taiki-e/install-action@64adfd9e935fa438859b9e080fd026720b2ba070 # tag=just
         with:
