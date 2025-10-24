@@ -69,4 +69,6 @@ jobs:
           .venv/bin/maturin develop --uv
 
       - name: Run tests
-        run: $(uv python find) -m pytest tests/ -v
+        run: |
+          source .venv/bin/activate
+          .venv/bin/pytest tests/ -v
