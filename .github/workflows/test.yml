@@ -29,22 +29,43 @@ jobs:
           set -euo pipefail
           MIN_VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.requires-python | sed 's/>=//;s/"//g')
           PYO3_FFI_VERSION=$(grep -m 1 -A 1 'name = "pyo3-ffi"' Cargo.lock | tail -n1 | cut -d '"' -f 2)
-          MAX_VERSION=$(
-            curl -sL "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-$PYO3_FFI_VERSION.crate" \
-            | tar -xzO "pyo3-ffi-$PYO3_FFI_VERSION/Cargo.toml" \
-            | uvx --from=toml-cli toml get --toml-path=/dev/stdin package.metadata.cpython.max-version \
-            | tr -d '"'
-          )
-          versions=$(uv python list --all-versions --output-format json | jq -c --arg min "$MIN_VERSION" --arg max "$MAX_VERSION" '
+          # Download the crate once and reuse the Cargo.toml extraction to avoid repeated curl calls
+          TMP_CRATE=$(mktemp)
+          curl -sL "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-$PYO3_FFI_VERSION.crate" -o "$TMP_CRATE"
+          # extract Cargo.toml content from the downloaded crate
+          CARGO_TOML_CONTENT=$(tar -xzO -f "$TMP_CRATE" "pyo3-ffi-$PYO3_FFI_VERSION/Cargo.toml" 2>/dev/null || true)
+          # get the supported CPython max version from the pyo3-ffi crate (from the extracted Cargo.toml)
+          MAX_VERSION=$(echo "$CARGO_TOML_CONTENT" | uvx --from=toml-cli toml get --toml-path=/dev/stdin package.metadata.cpython.max-version | tr -d '"')
+          # get the supported PyPy max version
+          PYPY_MAX=$(echo "$CARGO_TOML_CONTENT" | uvx --from=toml-cli toml get --toml-path=/dev/stdin package.metadata.pypy.max-version | tr -d '"')
+          # gather the list once and derive CPython and (optional) PyPy sets from it
+          LIST=$(uv python list --all-versions --output-format json)
+
+          CPYTHON_VERSIONS=$(echo "$LIST" | jq -c --arg min "$MIN_VERSION" --arg max "$MAX_VERSION" '
             ($min | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $minv |
             ($max | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $maxv |
-            [.[] | {v:.version_parts, t:.variant}]
-            | unique_by([.v.minor,.t])
+            [.[] | {v:.version_parts, t:.variant, impl:.implementation}]
+            | unique_by([.v.minor,.impl])
             | map(select(
-                (.v.major > $minv.major or (.v.major == $minv.major and .v.minor >= $minv.minor)) and
-                (.v.major < $maxv.major or (.v.major == $maxv.major and .v.minor <= $maxv.minor))
+                (.impl == "cpython") and
+                ((.v.major > $minv.major or (.v.major == $minv.major and .v.minor >= $minv.minor)) and
+                 (.v.major < $maxv.major or (.v.major == $maxv.major and .v.minor <= $maxv.minor)))
               ))
             | map("\(.v.major).\(.v.minor)\(if .t=="freethreaded" then "t" else "" end)")')
+          PYPY_VERSIONS=$(echo "$LIST" | jq -c --arg min "$MIN_VERSION" --arg max "$PYPY_MAX" '
+            ($min | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $minv |
+            ($max | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $maxv |
+            [.[] | {v:.version_parts, t:.variant, impl:.implementation}]
+            | unique_by([.v.minor,.impl])
+            | map(select(
+                (.impl == "pypy") and
+                ((.v.major > $minv.major or (.v.major == $minv.major and .v.minor >= $minv.minor)) and
+                  (.v.major < $maxv.major or (.v.major == $maxv.major and .v.minor <= $maxv.minor)))
+              ))
+            | map("pypy-\(.v.major).\(.v.minor)")')
+          # merge arrays
+          versions=$(jq -nc --argjson a "$CPYTHON_VERSIONS" --argjson b "$PYPY_VERSIONS" '$a + $b')
+
           echo "python-versions=$versions" >> $GITHUB_OUTPUT
 
   test:
