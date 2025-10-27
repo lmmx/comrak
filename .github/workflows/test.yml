@@ -47,7 +47,7 @@ jobs:
             ($min | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $minv |
             ($max | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $maxv |
             [.[] | {v:.version_parts, t:.variant, impl:.implementation}]
-            | unique_by([.v.minor,.impl])
+            | unique_by([.v.minor,.t])
             | map(select(
                 (.impl == "cpython") and
                 ((.v.major > $minv.major or (.v.major == $minv.major and .v.minor >= $minv.minor)) and
