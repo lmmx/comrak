@@ -8,7 +8,7 @@
 [![License](https://img.shields.io/pypi/l/comrak.svg)](https://pypi.python.org/pypi/comrak)
 [![pre-commit.ci status](https://results.pre-commit.ci/badge/github/lmmx/comrak/master.svg)](https://results.pre-commit.ci/latest/github/lmmx/comrak/master)
 
-Python bindings for the Comrak Rust library, a fast CommonMark/GFM parser
+Python bindings for the [Comrak Rust library](https://crates.io/crates/comrak), a fast CommonMark/GFM parser
 
 ## Installation
 
