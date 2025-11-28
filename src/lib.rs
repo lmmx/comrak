@@ -34,7 +34,7 @@ fn render_markdown(
     Ok(html)
 }
 
-#[pymodule]
+#[pymodule(gil_used = false)]
 fn comrak(m: &Bound<'_, PyModule>) -> PyResult<()> {
     // Expose the function
     m.add_function(wrap_pyfunction!(render_markdown, m)?)?;
