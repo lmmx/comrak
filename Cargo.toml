@@ -1,6 +1,6 @@
 [dependencies]
 comrak_lib = {package = "comrak", version = "0.49.0", features = ["shortcodes"]}
-pyo3 = {version = "0.27.0"}
+pyo3 = {version = "0.27.2"}
 
 [lib]
 name = "comrak"
