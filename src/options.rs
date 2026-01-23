@@ -82,8 +82,7 @@ pub struct PyExtensionOptions {
     pub greentext: bool,
     /// Optional callable that rewrites link URLs.
     /// The callable should accept a URL string and return a modified URL string.
-    /// Wrapped in Arc for clonability.
-    pub link_url_rewriter: Option<Arc<PyURLRewriter>>,
+    pub link_url_rewriter: Option<Arc<dyn URLRewriter>>,
 }
 
 impl PyExtensionOptions {
@@ -110,9 +109,7 @@ impl PyExtensionOptions {
         opts.subscript = self.subscript;
         opts.spoiler = self.spoiler;
         opts.greentext = self.greentext;
-        if let Some(ref rewriter) = self.link_url_rewriter {
-            opts.link_url_rewriter = Some(rewriter.clone());
-        }
+        opts.link_url_rewriter = self.link_url_rewriter.clone();
     }
 }
 
@@ -143,23 +140,15 @@ impl PyExtensionOptions {
             subscript: defaults.subscript,
             spoiler: defaults.spoiler,
             greentext: defaults.greentext,
-            link_url_rewriter: None,
+            link_url_rewriter: defaults.link_url_rewriter.clone(),
         }
-    }
-
-    /// Get the link URL rewriter callback.
-    #[getter]
-    pub fn get_link_url_rewriter(&self, py: Python<'_>) -> Option<Py<PyAny>> {
-        self.link_url_rewriter
-            .as_ref()
-            .map(|r| r.callback.clone_ref(py))
     }
 
     /// Set a callable to rewrite link URLs.
     /// The callable should accept a URL string and return a modified URL string.
     #[setter]
     pub fn set_link_url_rewriter(&mut self, callback: Option<Py<PyAny>>) {
-        self.link_url_rewriter = callback.map(|cb| Arc::new(PyURLRewriter::new(cb)));
+        self.link_url_rewriter = callback.map(|cb| Arc::new(PyURLRewriter::new(cb)) as _);
     }
 }
 
