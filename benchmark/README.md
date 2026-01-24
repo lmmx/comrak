@@ -10,17 +10,17 @@ bash run_small_benchmark.sh
 Benchmark 1: baseline
   Time (mean ± σ):      15.4 ms ±   0.4 ms    [User: 11.3 ms, System: 4.0 ms]
   Range (min … max):    14.9 ms …  19.7 ms    190 runs
- 
+
   Warning: Statistical outliers were detected. Consider re-running this benchmark on a quiet system without any interferences from other programs. It might help to use the '--warmup' or '--prepare' options.
- 
+
 Benchmark 2: markdown
   Time (mean ± σ):     300.4 ms ±   5.7 ms    [User: 291.1 ms, System: 8.6 ms]
   Range (min … max):   290.8 ms … 308.1 ms    10 runs
- 
+
 Benchmark 3: markdown2
   Time (mean ± σ):     212.7 ms ±   3.5 ms    [User: 204.0 ms, System: 8.4 ms]
   Range (min … max):   206.6 ms … 219.6 ms    13 runs
- 
+
 Summary
   baseline ran
    13.82 ± 0.41 times faster than markdown2
@@ -39,15 +39,15 @@ bash run_medium_benchmark.sh
 Benchmark 1: baseline
   Time (mean ± σ):      31.0 ms ±   0.8 ms    [User: 24.7 ms, System: 6.1 ms]
   Range (min … max):    29.5 ms …  32.8 ms    90 runs
- 
+
 Benchmark 2: markdown
   Time (mean ± σ):     632.0 ms ±   4.4 ms    [User: 621.7 ms, System: 9.7 ms]
   Range (min … max):   625.8 ms … 639.6 ms    10 runs
- 
+
 Benchmark 3: markdown2
   Time (mean ± σ):      2.620 s ±  0.017 s    [User: 2.610 s, System: 0.010 s]
   Range (min … max):    2.592 s …  2.647 s    10 runs
- 
+
 Summary
   baseline ran
    20.40 ± 0.52 times faster than markdown
@@ -66,15 +66,15 @@ bash run_large_benchmark.sh
 Benchmark 1: baseline
   Time (mean ± σ):      24.9 ms ±   0.4 ms    [User: 19.3 ms, System: 5.5 ms]
   Range (min … max):    24.3 ms …  26.1 ms    118 runs
- 
+
 Benchmark 2: markdown
   Time (mean ± σ):     237.6 ms ±   9.0 ms    [User: 225.0 ms, System: 12.1 ms]
   Range (min … max):   228.0 ms … 258.5 ms    12 runs
- 
+
 Benchmark 3: markdown2
   Time (mean ± σ):     408.5 ms ±   5.7 ms    [User: 400.5 ms, System: 7.8 ms]
   Range (min … max):   403.6 ms … 422.8 ms    10 runs
- 
+
 Summary
   baseline ran
     9.54 ± 0.39 times faster than markdown
