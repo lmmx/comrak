@@ -1,12 +1,40 @@
 use pyo3::prelude::*;
+use std::panic::RefUnwindSafe;
+use std::sync::Arc;
 
 // Import the Comrak (Rust) types under `comrak_lib::`
 use comrak_lib::options::{
     Extension as ComrakExtensionOptions, ListStyleType, Parse as ComrakParseOptions,
-    Render as ComrakRenderOptions,
+    Render as ComrakRenderOptions, URLRewriter,
 };
 
-/// Python class that mirrors Comrak’s `ExtensionOptions`
+/// A wrapper around a Python callable that implements URLRewriter.
+/// This allows Python functions to be used as URL rewriters in Comrak.
+pub struct PyURLRewriter {
+    callback: Py<PyAny>,
+}
+
+// Py<PyAny> is Send + Sync; we handle Python exceptions by returning the original URL
+impl RefUnwindSafe for PyURLRewriter {}
+
+impl PyURLRewriter {
+    pub fn new(callback: Py<PyAny>) -> Self {
+        Self { callback }
+    }
+}
+
+impl URLRewriter for PyURLRewriter {
+    fn to_html(&self, url: &str) -> String {
+        Python::attach(|py| {
+            self.callback
+                .call1(py, (url,))
+                .and_then(|result| result.extract::<String>(py))
+                .unwrap_or_else(|_| url.to_string())
+        })
+    }
+}
+
+/// Python class that mirrors Comrak's `ExtensionOptions`
 #[pyclass(name = "ExtensionOptions")]
 #[derive(Clone)]
 pub struct PyExtensionOptions {
@@ -52,6 +80,9 @@ pub struct PyExtensionOptions {
     pub spoiler: bool,
     #[pyo3(get, set)]
     pub greentext: bool,
+    /// Optional callable that rewrites link URLs.
+    /// The callable should accept a URL string and return a modified URL string.
+    pub link_url_rewriter: Option<Arc<dyn URLRewriter>>,
 }
 
 impl PyExtensionOptions {
@@ -78,6 +109,7 @@ impl PyExtensionOptions {
         opts.subscript = self.subscript;
         opts.spoiler = self.spoiler;
         opts.greentext = self.greentext;
+        opts.link_url_rewriter = self.link_url_rewriter.clone();
     }
 }
 
@@ -108,7 +140,15 @@ impl PyExtensionOptions {
             subscript: defaults.subscript,
             spoiler: defaults.spoiler,
             greentext: defaults.greentext,
+            link_url_rewriter: defaults.link_url_rewriter.clone(),
         }
+    }
+
+    /// Set a callable to rewrite link URLs.
+    /// The callable should accept a URL string and return a modified URL string.
+    #[setter]
+    pub fn set_link_url_rewriter(&mut self, callback: Option<Py<PyAny>>) {
+        self.link_url_rewriter = callback.map(|cb| Arc::new(PyURLRewriter::new(cb)) as _);
     }
 }
 
