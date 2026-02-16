@@ -47,8 +47,8 @@ class TestLinkUrlRewriter:
     def test_with_complex_urls(self):
         """Test rewriting URLs with query parameters and fragments."""
         opts = comrak.ExtensionOptions()
-        opts.link_url_rewriter = (
-            lambda url: f"https://safe.example.com/redirect?to={url}"
+        opts.link_url_rewriter = lambda url: (
+            f"https://safe.example.com/redirect?to={url}"
         )
 
         markdown = "[link](http://example.com/path?query=value#fragment)"
@@ -81,8 +81,8 @@ class TestLinkUrlRewriter:
         opts = comrak.ExtensionOptions()
         prefix = "user-content-"
         opts.header_ids = prefix
-        opts.link_url_rewriter = (
-            lambda url: f"#{prefix}{url[1:]}" if url.startswith("#") else url
+        opts.link_url_rewriter = lambda url: (
+            f"#{prefix}{url[1:]}" if url.startswith("#") else url
         )
 
         markdown = dedent("""\
