@@ -70,7 +70,7 @@ testpaths = "tests"
 addopts = "-v"
 
 [tool.ruff]
-extend-select = ["F", "UP"]
+lint.extend-select = ["F", "UP"]
 
 [tool.uv]
 # Build Rust code in development mode (faster builds)
