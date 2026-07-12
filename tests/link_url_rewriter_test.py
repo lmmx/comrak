@@ -68,8 +68,8 @@ class TestLinkUrlRewriter:
         # Image URL should NOT be rewritten
         assert "http://example.com/image.png" in result
 
-    def test_with_header_ids_prefix(self):
-        """Test rewriting anchor links to match header_ids prefix.
+    def test_with_header_id_prefix(self):
+        """Test rewriting anchor links to match `header_id_prefix`.
 
         When using header_ids with a prefix like "user-content-", the generated
         header anchors will have that prefix. This example shows how to use

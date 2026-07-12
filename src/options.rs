@@ -1,4 +1,5 @@
 use pyo3::prelude::*;
+use pyo3::exceptions::PyFutureWarning;
 use std::panic::RefUnwindSafe;
 use std::sync::Arc;
 
@@ -149,6 +150,18 @@ impl PyExtensionOptions {
     #[setter]
     pub fn set_link_url_rewriter(&mut self, callback: Option<Py<PyAny>>) {
         self.link_url_rewriter = callback.map(|cb| Arc::new(PyURLRewriter::new(cb)) as _);
+    }
+
+    #[getter]
+    #[pyo3(warn(message = "Use `header_id_prefix` instead", category = PyFutureWarning))]
+    pub fn header_ids(&self) -> Option<String> {
+        self.header_id_prefix.clone()
+    }
+
+    #[setter]
+    #[pyo3(warn(message = "Use `header_id_prefix` instead", category = PyFutureWarning))]
+    pub fn set_header_ids(&mut self, prefix: Option<String>) {
+        self.header_id_prefix = prefix;
     }
 }
 
