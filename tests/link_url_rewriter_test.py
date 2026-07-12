@@ -80,7 +80,7 @@ class TestLinkUrlRewriter:
         """
         opts = comrak.ExtensionOptions()
         prefix = "user-content-"
-        opts.header_ids = prefix
+        opts.header_id_prefix = prefix
         opts.link_url_rewriter = lambda url: (
             f"#{prefix}{url[1:]}" if url.startswith("#") else url
         )

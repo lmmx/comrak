@@ -4,7 +4,7 @@ use std::sync::Arc;
 
 // Import the Comrak (Rust) types under `comrak_lib::`
 use comrak_lib::options::{
-    Extension as ComrakExtensionOptions, ListStyleType, Parse as ComrakParseOptions,
+    Extension as ComrakExtensionOptions, ListStyleType, AlertStyleType, Parse as ComrakParseOptions,
     Render as ComrakRenderOptions, URLRewriter,
 };
 
@@ -35,7 +35,7 @@ impl URLRewriter for PyURLRewriter {
 }
 
 /// Python class that mirrors Comrak's `ExtensionOptions`
-#[pyclass(name = "ExtensionOptions")]
+#[pyclass(name = "ExtensionOptions", from_py_object)]
 #[derive(Clone)]
 pub struct PyExtensionOptions {
     #[pyo3(get, set)]
@@ -51,7 +51,7 @@ pub struct PyExtensionOptions {
     #[pyo3(get, set)]
     pub superscript: bool,
     #[pyo3(get, set)]
-    pub header_ids: Option<String>,
+    pub header_id_prefix: Option<String>,
     #[pyo3(get, set)]
     pub footnotes: bool,
     #[pyo3(get, set)]
@@ -94,7 +94,7 @@ impl PyExtensionOptions {
         opts.autolink = self.autolink;
         opts.tasklist = self.tasklist;
         opts.superscript = self.superscript;
-        opts.header_ids = self.header_ids.clone();
+        opts.header_id_prefix = self.header_id_prefix.clone();
         opts.footnotes = self.footnotes;
         opts.description_lists = self.description_lists;
         opts.front_matter_delimiter = self.front_matter_delimiter.clone();
@@ -125,7 +125,7 @@ impl PyExtensionOptions {
             autolink: defaults.autolink,
             tasklist: defaults.tasklist,
             superscript: defaults.superscript,
-            header_ids: defaults.header_ids.clone(),
+            header_id_prefix: defaults.header_id_prefix.clone(),
             footnotes: defaults.footnotes,
             description_lists: defaults.description_lists,
             front_matter_delimiter: defaults.front_matter_delimiter.clone(),
@@ -153,7 +153,7 @@ impl PyExtensionOptions {
 }
 
 /// Python class that mirrors Comrak’s `ParseOptions`
-#[pyclass(name = "ParseOptions")]
+#[pyclass(name = "ParseOptions", from_py_object)]
 #[derive(Clone)]
 pub struct PyParseOptions {
     #[pyo3(get, set)]
@@ -195,7 +195,7 @@ impl PyParseOptions {
 }
 
 /// Python class that mirrors Comrak’s `RenderOptions`
-#[pyclass(name = "RenderOptions")]
+#[pyclass(name = "RenderOptions", from_py_object)]
 #[derive(Clone)]
 pub struct PyRenderOptions {
     #[pyo3(get, set)]
@@ -212,6 +212,8 @@ pub struct PyRenderOptions {
     pub escape: bool,
     #[pyo3(get, set)]
     pub list_style: u8, // store 42 = '*', 43 = '+', 45 = '-'
+    #[pyo3(get, set)]
+    alert_style: PyAlertStyle,
     #[pyo3(get, set)]
     pub sourcepos: bool,
     #[pyo3(get, set)]
@@ -230,6 +232,31 @@ pub struct PyRenderOptions {
     pub ol_width: usize,
 }
 
+#[derive(Clone, Copy, Debug)]
+#[pyclass(name = "AlertStyle", from_py_object)]
+pub enum PyAlertStyle {
+    Specific,
+    Semantic,
+}
+
+impl Into<AlertStyleType> for PyAlertStyle {
+    fn into(self) -> AlertStyleType {
+        match self {
+            PyAlertStyle::Specific => AlertStyleType::Specific,
+            PyAlertStyle::Semantic => AlertStyleType::Semantic,
+        }
+    }
+}
+
+impl Into<PyAlertStyle> for AlertStyleType {
+    fn into(self) -> PyAlertStyle {
+        match self {
+            AlertStyleType::Specific => PyAlertStyle::Specific,
+            AlertStyleType::Semantic => PyAlertStyle::Semantic,
+        }
+    }
+}
+
 impl PyRenderOptions {
     /// Rust-only helper
     pub fn update_render_options(&self, opts: &mut ComrakRenderOptions) {
@@ -245,6 +272,7 @@ impl PyRenderOptions {
             42 => ListStyleType::Star, // '*'
             _ => ListStyleType::Dash,  // '-'
         };
+        opts.alert_style = self.alert_style.into();
         opts.sourcepos = self.sourcepos;
         opts.escaped_char_spans = self.escaped_char_spans;
         opts.ignore_empty_links = self.ignore_empty_links;
@@ -269,6 +297,7 @@ impl PyRenderOptions {
             unsafe_: defaults.r#unsafe,
             escape: defaults.escape,
             list_style: defaults.list_style as u8, // 45 if dash
+            alert_style: defaults.alert_style.into(),
             sourcepos: defaults.sourcepos,
             escaped_char_spans: defaults.escaped_char_spans,
             ignore_empty_links: defaults.ignore_empty_links,
