@@ -35,7 +35,7 @@ impl URLRewriter for PyURLRewriter {
 }
 
 /// Python class that mirrors Comrak's `ExtensionOptions`
-#[pyclass(name = "ExtensionOptions")]
+#[pyclass(name = "ExtensionOptions", from_py_object)]
 #[derive(Clone)]
 pub struct PyExtensionOptions {
     #[pyo3(get, set)]
@@ -153,7 +153,7 @@ impl PyExtensionOptions {
 }
 
 /// Python class that mirrors Comrak’s `ParseOptions`
-#[pyclass(name = "ParseOptions")]
+#[pyclass(name = "ParseOptions", from_py_object)]
 #[derive(Clone)]
 pub struct PyParseOptions {
     #[pyo3(get, set)]
@@ -195,7 +195,7 @@ impl PyParseOptions {
 }
 
 /// Python class that mirrors Comrak’s `RenderOptions`
-#[pyclass(name = "RenderOptions")]
+#[pyclass(name = "RenderOptions", from_py_object)]
 #[derive(Clone)]
 pub struct PyRenderOptions {
     #[pyo3(get, set)]
