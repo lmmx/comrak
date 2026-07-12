@@ -174,19 +174,19 @@ class TestRenderOptions:
                 comrak.AlertStyle.Specific,
                 '<div class="markdown-alert markdown-alert-note">\n'
                 '<p class="markdown-alert-title">Note</p>\n'
-                '<p>Note this!</p>\n'
-                '</div>',
+                "<p>Note this!</p>\n"
+                "</div>",
                 id="specific",
             ),
             pytest.param(
                 comrak.AlertStyle.Semantic,
                 '<aside class="admonition note">\n'
                 '<p class="admonition-title">Note</p>\n'
-                '<p>Note this!</p>\n'
-                '</aside>',
+                "<p>Note this!</p>\n"
+                "</aside>",
                 id="semantic",
             ),
-        ]
+        ],
     )
     def test_alerts(self, style: comrak.AlertStyle, expected: str) -> None:
         e_opts = comrak.ExtensionOptions()
@@ -194,7 +194,9 @@ class TestRenderOptions:
         r_opts = comrak.RenderOptions()
         r_opts.alert_style = style
         markdown = "> [!note]\n> Note this!"
-        result = comrak.render_markdown(markdown, extension_options=e_opts, render_options=r_opts)
+        result = comrak.render_markdown(
+            markdown, extension_options=e_opts, render_options=r_opts
+        )
         assert expected in result
 
 
