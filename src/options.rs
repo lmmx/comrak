@@ -252,18 +252,18 @@ pub enum PyAlertStyle {
     Semantic,
 }
 
-impl Into<AlertStyleType> for PyAlertStyle {
-    fn into(self) -> AlertStyleType {
-        match self {
+impl From<PyAlertStyle> for AlertStyleType {
+    fn from(val: PyAlertStyle) -> Self {
+        match val {
             PyAlertStyle::Specific => AlertStyleType::Specific,
             PyAlertStyle::Semantic => AlertStyleType::Semantic,
         }
     }
 }
 
-impl Into<PyAlertStyle> for AlertStyleType {
-    fn into(self) -> PyAlertStyle {
-        match self {
+impl From<AlertStyleType> for PyAlertStyle {
+    fn from(val: AlertStyleType) -> Self {
+        match val {
             AlertStyleType::Specific => PyAlertStyle::Specific,
             AlertStyleType::Semantic => PyAlertStyle::Semantic,
         }
