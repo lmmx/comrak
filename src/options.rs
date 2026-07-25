@@ -36,7 +36,7 @@ impl URLRewriter for PyURLRewriter {
 }
 
 /// Python class that mirrors Comrak's `ExtensionOptions`
-#[pyclass(name = "ExtensionOptions", from_py_object)]
+#[pyclass(name = "ExtensionOptions", module = "comrak", from_py_object)]
 #[derive(Clone)]
 pub struct PyExtensionOptions {
     #[pyo3(get, set)]
@@ -166,7 +166,7 @@ impl PyExtensionOptions {
 }
 
 /// Python class that mirrors Comrak’s `ParseOptions`
-#[pyclass(name = "ParseOptions", from_py_object)]
+#[pyclass(name = "ParseOptions", module = "comrak", from_py_object)]
 #[derive(Clone)]
 pub struct PyParseOptions {
     #[pyo3(get, set)]
@@ -208,7 +208,7 @@ impl PyParseOptions {
 }
 
 /// Python class that mirrors Comrak’s `RenderOptions`
-#[pyclass(name = "RenderOptions", from_py_object)]
+#[pyclass(name = "RenderOptions", module = "comrak", from_py_object)]
 #[derive(Clone)]
 pub struct PyRenderOptions {
     #[pyo3(get, set)]
@@ -246,7 +246,7 @@ pub struct PyRenderOptions {
 }
 
 #[derive(Clone, Copy, Debug)]
-#[pyclass(name = "AlertStyle", from_py_object)]
+#[pyclass(name = "AlertStyle", module = "comrak", from_py_object)]
 pub enum PyAlertStyle {
     Specific,
     Semantic,
