@@ -54,7 +54,23 @@ pub struct PyExtensionOptions {
     #[pyo3(get, set)]
     pub header_id_prefix: Option<String>,
     #[pyo3(get, set)]
+    pub header_id_prefix_in_href: bool,
+    #[pyo3(get, set)]
     pub footnotes: bool,
+    #[pyo3(get, set)]
+    pub inline_footnotes: bool,
+    #[pyo3(get, set)]
+    pub cjk_friendly_emphasis: bool,
+    #[pyo3(get, set)]
+    pub subtext: bool,
+    #[pyo3(get, set)]
+    pub highlight: bool,
+    #[pyo3(get, set)]
+    pub math_latex: bool,
+    #[pyo3(get, set)]
+    pub insert: bool,
+    #[pyo3(get, set)]
+    pub block_directive: bool,
     #[pyo3(get, set)]
     pub description_lists: bool,
     #[pyo3(get, set)]
@@ -68,7 +84,7 @@ pub struct PyExtensionOptions {
     #[pyo3(get, set)]
     pub math_code: bool,
     #[pyo3(get, set)]
-    pub shortcodes: bool, // if your comrak_lib has the "shortcodes" feature
+    pub shortcodes: bool,
     #[pyo3(get, set)]
     pub wikilinks_title_after_pipe: bool,
     #[pyo3(get, set)]
@@ -82,6 +98,7 @@ pub struct PyExtensionOptions {
     #[pyo3(get, set)]
     pub greentext: bool,
     pub link_url_rewriter: Option<Arc<Py<PyAny>>>,
+    pub image_url_rewriter: Option<Arc<Py<PyAny>>>,
 }
 
 impl PyExtensionOptions {
@@ -94,6 +111,14 @@ impl PyExtensionOptions {
         opts.tasklist = self.tasklist;
         opts.superscript = self.superscript;
         opts.header_id_prefix = self.header_id_prefix.clone();
+        opts.header_id_prefix_in_href = self.header_id_prefix_in_href;
+        opts.inline_footnotes = self.inline_footnotes;
+        opts.cjk_friendly_emphasis = self.cjk_friendly_emphasis;
+        opts.subtext = self.subtext;
+        opts.highlight = self.highlight;
+        opts.math_latex = self.math_latex;
+        opts.insert = self.insert;
+        opts.block_directive = self.block_directive;
         opts.footnotes = self.footnotes;
         opts.description_lists = self.description_lists;
         opts.front_matter_delimiter = self.front_matter_delimiter.clone();
@@ -108,6 +133,10 @@ impl PyExtensionOptions {
         opts.subscript = self.subscript;
         opts.spoiler = self.spoiler;
         opts.greentext = self.greentext;
+        opts.image_url_rewriter = self
+            .image_url_rewriter
+            .clone()
+            .map(|cb| Arc::new(PyURLRewriter::new(cb)) as Arc<dyn URLRewriter>);
         opts.link_url_rewriter = self
             .link_url_rewriter
             .clone()
@@ -128,6 +157,14 @@ impl PyExtensionOptions {
             tasklist: defaults.tasklist,
             superscript: defaults.superscript,
             header_id_prefix: defaults.header_id_prefix.clone(),
+            block_directive: defaults.block_directive,
+            cjk_friendly_emphasis: defaults.cjk_friendly_emphasis,
+            header_id_prefix_in_href: defaults.header_id_prefix_in_href,
+            highlight: defaults.highlight,
+            math_latex: defaults.math_latex,
+            inline_footnotes: defaults.inline_footnotes,
+            insert: defaults.insert,
+            subtext: defaults.subtext,
             footnotes: defaults.footnotes,
             description_lists: defaults.description_lists,
             front_matter_delimiter: defaults.front_matter_delimiter.clone(),
@@ -135,7 +172,7 @@ impl PyExtensionOptions {
             alerts: defaults.alerts,
             math_dollars: defaults.math_dollars,
             math_code: defaults.math_code,
-            shortcodes: false, // or `defaults.shortcodes` if your version has that
+            shortcodes: defaults.shortcodes,
             wikilinks_title_after_pipe: defaults.wikilinks_title_after_pipe,
             wikilinks_title_before_pipe: defaults.wikilinks_title_before_pipe,
             underline: defaults.underline,
@@ -143,6 +180,7 @@ impl PyExtensionOptions {
             spoiler: defaults.spoiler,
             greentext: defaults.greentext,
             link_url_rewriter: None,
+            image_url_rewriter: None,
         }
     }
 
@@ -156,6 +194,18 @@ impl PyExtensionOptions {
     #[setter]
     pub fn set_link_url_rewriter(&mut self, callback: Option<Py<PyAny>>) {
         self.link_url_rewriter = callback.map(Arc::new);
+    }
+
+    /// Optional callable that rewrites image URLs.
+    /// the callable should accept a URL string and return a modified URL string.
+    #[getter]
+    pub fn image_url_rewriter(&self, py: Python<'_>) -> Option<Py<PyAny>> {
+        self.image_url_rewriter.as_ref().map(|cb| cb.clone_ref(py))
+    }
+
+    #[setter]
+    pub fn set_image_url_rewriter(&mut self, callback: Option<Py<PyAny>>) {
+        self.image_url_rewriter = callback.map(Arc::new);
     }
 
     #[getter]
@@ -185,6 +235,14 @@ pub struct PyParseOptions {
     pub relaxed_autolinks: bool,
     #[pyo3(get, set)]
     pub ignore_setext: bool,
+    #[pyo3(get, set)]
+    pub tasklist_in_table: bool,
+    #[pyo3(get, set)]
+    pub leave_footnote_definitions: bool,
+    #[pyo3(get, set)]
+    pub escaped_char_spans: bool,
+    #[pyo3(get, set)]
+    pub sourcepos_chars: bool,
 }
 
 impl PyParseOptions {
@@ -195,6 +253,10 @@ impl PyParseOptions {
         opts.relaxed_tasklist_matching = self.relaxed_tasklist_matching;
         opts.relaxed_autolinks = self.relaxed_autolinks;
         opts.ignore_setext = self.ignore_setext;
+        opts.tasklist_in_table = self.tasklist_in_table;
+        opts.leave_footnote_definitions = self.leave_footnote_definitions;
+        opts.escaped_char_spans = self.escaped_char_spans;
+        opts.sourcepos_chars = self.sourcepos_chars;
     }
 }
 
@@ -209,6 +271,10 @@ impl PyParseOptions {
             relaxed_tasklist_matching: defaults.relaxed_tasklist_matching,
             relaxed_autolinks: defaults.relaxed_autolinks,
             ignore_setext: defaults.ignore_setext,
+            leave_footnote_definitions: defaults.leave_footnote_definitions,
+            escaped_char_spans: defaults.escaped_char_spans,
+            sourcepos_chars: defaults.sourcepos_chars,
+            tasklist_in_table: defaults.tasklist_in_table,
         }
     }
 }
@@ -230,7 +296,7 @@ pub struct PyRenderOptions {
     #[pyo3(get, set)]
     pub escape: bool,
     #[pyo3(get, set)]
-    pub list_style: u8, // store 42 = '*', 43 = '+', 45 = '-'
+    pub list_style: PyListStyle,
     #[pyo3(get, set)]
     pub alert_style: PyAlertStyle,
     #[pyo3(get, set)]
@@ -249,6 +315,10 @@ pub struct PyRenderOptions {
     pub tasklist_classes: bool,
     #[pyo3(get, set)]
     pub ol_width: usize,
+    #[pyo3(get, set)]
+    pub experimental_minimize_commonmark: bool,
+    #[pyo3(get, set)]
+    pub compact_html: bool,
 }
 
 #[derive(Clone, Copy, Debug, Hash, PartialEq)]
@@ -284,6 +354,42 @@ impl From<AlertStyleType> for PyAlertStyle {
     }
 }
 
+#[derive(Clone, Copy, Debug, Hash, PartialEq)]
+#[pyclass(
+    name = "ListStyle",
+    module = "comrak",
+    from_py_object,
+    eq,
+    eq_int,
+    frozen,
+    hash
+)]
+pub enum PyListStyle {
+    Dash = 45,
+    Plus = 43,
+    Star = 42,
+}
+
+impl From<PyListStyle> for ListStyleType {
+    fn from(val: PyListStyle) -> Self {
+        match val {
+            PyListStyle::Dash => ListStyleType::Dash,
+            PyListStyle::Plus => ListStyleType::Plus,
+            PyListStyle::Star => ListStyleType::Star,
+        }
+    }
+}
+
+impl From<ListStyleType> for PyListStyle {
+    fn from(val: ListStyleType) -> Self {
+        match val {
+            ListStyleType::Dash => PyListStyle::Dash,
+            ListStyleType::Plus => PyListStyle::Plus,
+            ListStyleType::Star => PyListStyle::Star,
+        }
+    }
+}
+
 impl PyRenderOptions {
     /// Rust-only helper
     pub fn update_render_options(&self, opts: &mut ComrakRenderOptions) {
@@ -293,12 +399,7 @@ impl PyRenderOptions {
         opts.width = self.width;
         opts.r#unsafe = self.unsafe_;
         opts.escape = self.escape;
-        // convert integer to ListStyleType
-        opts.list_style = match self.list_style {
-            43 => ListStyleType::Plus, // '+'
-            42 => ListStyleType::Star, // '*'
-            _ => ListStyleType::Dash,  // '-'
-        };
+        opts.list_style = self.list_style.into();
         opts.alert_style = self.alert_style.into();
         opts.sourcepos = self.sourcepos;
         opts.escaped_char_spans = self.escaped_char_spans;
@@ -308,6 +409,8 @@ impl PyRenderOptions {
         opts.figure_with_caption = self.figure_with_caption;
         opts.tasklist_classes = self.tasklist_classes;
         opts.ol_width = self.ol_width;
+        opts.experimental_minimize_commonmark = self.experimental_minimize_commonmark;
+        opts.compact_html = self.compact_html;
     }
 }
 
@@ -323,7 +426,7 @@ impl PyRenderOptions {
             width: defaults.width,
             unsafe_: defaults.r#unsafe,
             escape: defaults.escape,
-            list_style: defaults.list_style as u8, // 45 if dash
+            list_style: defaults.list_style.into(),
             alert_style: defaults.alert_style.into(),
             sourcepos: defaults.sourcepos,
             escaped_char_spans: defaults.escaped_char_spans,
@@ -333,6 +436,8 @@ impl PyRenderOptions {
             figure_with_caption: defaults.figure_with_caption,
             tasklist_classes: defaults.tasklist_classes,
             ol_width: defaults.ol_width,
+            experimental_minimize_commonmark: defaults.experimental_minimize_commonmark,
+            compact_html: defaults.compact_html,
         }
     }
 }
