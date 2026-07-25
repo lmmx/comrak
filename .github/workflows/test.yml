@@ -29,6 +29,7 @@ jobs:
           set -euo pipefail
           MIN_VERSION=$(uvx --from=toml-cli toml get --toml-path=pyproject.toml project.requires-python | sed 's/>=//;s/"//g')
           PYO3_FFI_VERSION=$(grep -m 1 -A 1 'name = "pyo3-ffi"' Cargo.lock | tail -n1 | cut -d '"' -f 2)
+          FREETHREADED_MIN_MINOR=14
           # Download the crate once and reuse the Cargo.toml extraction to avoid repeated curl calls
           TMP_CRATE=$(mktemp)
           curl -sL "https://static.crates.io/crates/pyo3-ffi/pyo3-ffi-$PYO3_FFI_VERSION.crate" -o "$TMP_CRATE"
@@ -43,15 +44,17 @@ jobs:
           # gather the list once and derive CPython and (optional) PyPy sets from it
           LIST=$(uv python list --all-versions --output-format json)
 
-          CPYTHON_VERSIONS=$(echo "$LIST" | jq -c --arg min "$MIN_VERSION" --arg max "$MAX_VERSION" '
+          CPYTHON_VERSIONS=$(echo "$LIST" | jq -c --arg min "$MIN_VERSION" --arg max "$MAX_VERSION" --arg ftmin "$FREETHREADED_MIN_MINOR" '
             ($min | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $minv |
             ($max | split(".") | {major: .[0]|tonumber, minor: .[1]|tonumber}) as $maxv |
+            ($ftmin | tonumber) as $ftfloor |
             [.[] | {v:.version_parts, t:.variant, impl:.implementation}]
             | unique_by([.v.minor,.t])
             | map(select(
                 (.impl == "cpython") and
                 ((.v.major > $minv.major or (.v.major == $minv.major and .v.minor >= $minv.minor)) and
-                 (.v.major < $maxv.major or (.v.major == $maxv.major and .v.minor <= $maxv.minor)))
+                 (.v.major < $maxv.major or (.v.major == $maxv.major and .v.minor <= $maxv.minor))) and
+                (.t != "freethreaded" or .v.minor >= $ftfloor)
               ))
             | map("\(.v.major).\(.v.minor)\(if .t=="freethreaded" then "t" else "" end)")')
           PYPY_VERSIONS=$(echo "$LIST" | jq -c --arg min "$PYPY_MIN" --arg max "$PYPY_MAX" '
