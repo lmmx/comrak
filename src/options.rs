@@ -1,12 +1,12 @@
-use pyo3::prelude::*;
 use pyo3::exceptions::PyFutureWarning;
+use pyo3::prelude::*;
 use std::panic::RefUnwindSafe;
 use std::sync::Arc;
 
 // Import the Comrak (Rust) types under `comrak_lib::`
 use comrak_lib::options::{
-    Extension as ComrakExtensionOptions, ListStyleType, AlertStyleType, Parse as ComrakParseOptions,
-    Render as ComrakRenderOptions, URLRewriter,
+    AlertStyleType, Extension as ComrakExtensionOptions, ListStyleType,
+    Parse as ComrakParseOptions, Render as ComrakRenderOptions, URLRewriter,
 };
 
 /// A wrapper around a Python callable that implements URLRewriter.
