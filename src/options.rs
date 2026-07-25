@@ -226,7 +226,7 @@ pub struct PyRenderOptions {
     #[pyo3(get, set)]
     pub list_style: u8, // store 42 = '*', 43 = '+', 45 = '-'
     #[pyo3(get, set)]
-    alert_style: PyAlertStyle,
+    pub alert_style: PyAlertStyle,
     #[pyo3(get, set)]
     pub sourcepos: bool,
     #[pyo3(get, set)]
