@@ -864,9 +864,9 @@ class TestOptionCoverage:
         public = {name for name in dir(cls) if not name.startswith("_")}
         covered = self.TABLE_DRIVEN[class_name] | self.COVERED_INDIVIDUALLY[class_name]
 
-        assert (
-            public - covered == set()
-        ), f"{class_name} options with no test: {sorted(public - covered)}"
+        assert public - covered == set(), (
+            f"{class_name} options with no test: {sorted(public - covered)}"
+        )
         assert covered - public == set(), (
             f"{class_name} tests reference options that no longer exist: "
             f"{sorted(covered - public)}"
