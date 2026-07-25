@@ -40,11 +40,11 @@ mod comrak {
     use super::render_markdown;
 
     #[pymodule_export]
+    use super::PyAlertStyle;
+    #[pymodule_export]
     use super::PyExtensionOptions;
     #[pymodule_export]
     use super::PyParseOptions;
     #[pymodule_export]
     use super::PyRenderOptions;
-    #[pymodule_export]
-    use super::PyAlertStyle;
 }
