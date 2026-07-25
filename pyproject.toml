@@ -52,7 +52,7 @@ keywords = [
 ]
 readme = "README.md"
 requires-python = ">=3.9"
-version = "0.0.12"
+version = "0.0.13"
 
 [project.license]
 file = "LICENSE"
@@ -71,7 +71,7 @@ testpaths = "tests"
 addopts = "-v"
 
 [tool.ruff]
-extend-select = ["F", "UP"]
+lint.extend-select = ["F", "UP"]
 
 [tool.uv]
 # Build Rust code in development mode (faster builds)
