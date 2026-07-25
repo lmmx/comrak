@@ -252,7 +252,15 @@ pub struct PyRenderOptions {
 }
 
 #[derive(Clone, Copy, Debug, Hash, PartialEq)]
-#[pyclass(name = "AlertStyle", module = "comrak", from_py_object, eq, eq_int, frozen, hash)]
+#[pyclass(
+    name = "AlertStyle",
+    module = "comrak",
+    from_py_object,
+    eq,
+    eq_int,
+    frozen,
+    hash
+)]
 pub enum PyAlertStyle {
     Specific,
     Semantic,
@@ -327,4 +335,79 @@ impl PyRenderOptions {
             ol_width: defaults.ol_width,
         }
     }
+}
+
+/// Compile-time guards: these fail to build when comrak adds an option.
+/// When one breaks, add the field to the pyclass above, then name it here.
+#[allow(dead_code)]
+fn _exhaustiveness(
+    e: ComrakExtensionOptions<'_>,
+    p: ComrakParseOptions<'_>,
+    r: ComrakRenderOptions,
+) {
+    let ComrakExtensionOptions {
+        strikethrough: _,
+        tagfilter: _,
+        table: _,
+        autolink: _,
+        tasklist: _,
+        superscript: _,
+        header_id_prefix: _,
+        header_id_prefix_in_href: _,
+        footnotes: _,
+        inline_footnotes: _,
+        description_lists: _,
+        front_matter_delimiter: _,
+        multiline_block_quotes: _,
+        alerts: _,
+        math_dollars: _,
+        math_code: _,
+        shortcodes: _,
+        wikilinks_title_after_pipe: _,
+        wikilinks_title_before_pipe: _,
+        underline: _,
+        subscript: _,
+        spoiler: _,
+        greentext: _,
+        image_url_rewriter: _,
+        link_url_rewriter: _,
+        cjk_friendly_emphasis: _,
+        subtext: _,
+        highlight: _,
+        insert: _,
+        block_directive: _,
+        math_latex: _,
+    } = e;
+    let ComrakParseOptions {
+        smart: _,
+        default_info_string: _,
+        relaxed_tasklist_matching: _,
+        tasklist_in_table: _,
+        relaxed_autolinks: _,
+        ignore_setext: _,
+        broken_link_callback: _,
+        leave_footnote_definitions: _,
+        escaped_char_spans: _,
+        sourcepos_chars: _,
+    } = p;
+    let ComrakRenderOptions {
+        hardbreaks: _,
+        github_pre_lang: _,
+        full_info_string: _,
+        width: _,
+        r#unsafe: _,
+        escape: _,
+        list_style: _,
+        sourcepos: _,
+        escaped_char_spans: _,
+        ignore_empty_links: _,
+        gfm_quirks: _,
+        prefer_fenced: _,
+        figure_with_caption: _,
+        tasklist_classes: _,
+        alert_style: _,
+        ol_width: _,
+        experimental_minimize_commonmark: _,
+        compact_html: _,
+    } = r;
 }
