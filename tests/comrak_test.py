@@ -1,4 +1,5 @@
 import comrak
+import pytest
 
 
 class TestBasicRendering:
@@ -166,6 +167,38 @@ class TestRenderOptions:
         # By default, HTML should be escaped or removed
         assert "<script>" not in result or "&lt;script&gt;" in result
 
+    @pytest.mark.parametrize(
+        ("style", "expected"),
+        [
+            pytest.param(
+                comrak.AlertStyle.Specific,
+                '<div class="markdown-alert markdown-alert-note">\n'
+                '<p class="markdown-alert-title">Note</p>\n'
+                "<p>Note this!</p>\n"
+                "</div>",
+                id="specific",
+            ),
+            pytest.param(
+                comrak.AlertStyle.Semantic,
+                '<aside class="admonition note">\n'
+                '<p class="admonition-title">Note</p>\n'
+                "<p>Note this!</p>\n"
+                "</aside>",
+                id="semantic",
+            ),
+        ],
+    )
+    def test_alerts(self, style: comrak.AlertStyle, expected: str) -> None:
+        e_opts = comrak.ExtensionOptions()
+        e_opts.alerts = True
+        r_opts = comrak.RenderOptions()
+        r_opts.alert_style = style
+        markdown = "> [!note]\n> Note this!"
+        result = comrak.render_markdown(
+            markdown, extension_options=e_opts, render_options=r_opts
+        )
+        assert expected in result
+
 
 class TestOptionsObjects:
     """Test that options objects can be instantiated and configured."""
@@ -274,3 +307,49 @@ class TestRegressions:
         markdown = "\n".join([f"# Heading {i}" for i in range(1000)])
         result = comrak.render_markdown(markdown)
         assert result.count("<h1>") == 1000
+
+
+class TestAlertStyle:
+    """Test AlertStyle enum ergonomics (eq, eq_int, hash, module)."""
+
+    def test_value_equality(self):
+        """Same variant compares equal even across separate object instances."""
+        assert comrak.AlertStyle.Specific == comrak.AlertStyle.Specific
+        assert comrak.AlertStyle.Semantic == comrak.AlertStyle.Semantic
+        assert comrak.AlertStyle.Specific != comrak.AlertStyle.Semantic
+
+    @pytest.mark.parametrize(
+        ("style", "expected_int"),
+        [
+            pytest.param(comrak.AlertStyle.Specific, 0, id="specific"),
+            pytest.param(comrak.AlertStyle.Semantic, 1, id="semantic"),
+        ],
+    )
+    def test_int_conversion(self, style, expected_int):
+        """int() reflects the variant's discriminant."""
+        assert int(style) == expected_int
+
+    @pytest.mark.parametrize(
+        ("style", "matching_int", "other_int"),
+        [
+            pytest.param(comrak.AlertStyle.Specific, 0, 1, id="specific"),
+            pytest.param(comrak.AlertStyle.Semantic, 1, 0, id="semantic"),
+        ],
+    )
+    def test_eq_int(self, style, matching_int, other_int):
+        """eq_int allows comparison against the raw discriminant."""
+        assert style == matching_int
+        assert style != other_int
+
+    def test_hashable(self):
+        """frozen + hash make AlertStyle usable as a dict key / set member."""
+        mapping = {
+            comrak.AlertStyle.Specific: "specific",
+            comrak.AlertStyle.Semantic: "semantic",
+        }
+        assert mapping[comrak.AlertStyle.Specific] == "specific"
+        assert len({comrak.AlertStyle.Specific, comrak.AlertStyle.Specific}) == 1
+
+    def test_module(self):
+        """module='comrak' fixes repr and qualified name for pickling."""
+        assert comrak.AlertStyle.__module__ == "comrak"

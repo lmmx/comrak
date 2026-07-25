@@ -68,10 +68,10 @@ class TestLinkUrlRewriter:
         # Image URL should NOT be rewritten
         assert "http://example.com/image.png" in result
 
-    def test_with_header_ids_prefix(self):
-        """Test rewriting anchor links to match header_ids prefix.
+    def test_with_header_id_prefix(self):
+        """Test rewriting anchor links to match `header_id_prefix`.
 
-        When using header_ids with a prefix like "user-content-", the generated
+        When using header_id_prefix with a prefix like "user-content-", the generated
         header anchors will have that prefix. This example shows how to use
         link_url_rewriter to update anchor links written in markdown to match.
 
@@ -80,7 +80,7 @@ class TestLinkUrlRewriter:
         """
         opts = comrak.ExtensionOptions()
         prefix = "user-content-"
-        opts.header_ids = prefix
+        opts.header_id_prefix = prefix
         opts.link_url_rewriter = lambda url: (
             f"#{prefix}{url[1:]}" if url.startswith("#") else url
         )
