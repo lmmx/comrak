@@ -17,4 +17,3 @@ lto = "thin"
 codegen-units = 1
 panic = "abort"
 debug = false
-strip = "symbols"
