@@ -5,7 +5,7 @@ use comrak_lib::{markdown_to_html, Options as ComrakOptions};
 
 // Import the Python option classes we defined
 mod options;
-use options::{PyAlertStyle, PyListStyle, PyExtensionOptions, PyParseOptions, PyRenderOptions};
+use options::{PyAlertStyle, PyExtensionOptions, PyListStyle, PyParseOptions, PyRenderOptions};
 
 /// Render a Markdown string to HTML, with optional Extension/Parse/Render overrides.
 #[pyfunction(signature=(text, extension_options=None, parse_options=None, render_options=None))]
@@ -42,9 +42,9 @@ mod comrak {
     #[pymodule_export]
     use super::PyAlertStyle;
     #[pymodule_export]
-    use super::PyListStyle;
-    #[pymodule_export]
     use super::PyExtensionOptions;
+    #[pymodule_export]
+    use super::PyListStyle;
     #[pymodule_export]
     use super::PyParseOptions;
     #[pymodule_export]
