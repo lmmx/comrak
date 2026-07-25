@@ -245,8 +245,8 @@ pub struct PyRenderOptions {
     pub ol_width: usize,
 }
 
-#[derive(Clone, Copy, Debug)]
-#[pyclass(name = "AlertStyle", module = "comrak", from_py_object)]
+#[derive(Clone, Copy, Debug, Hash, PartialEq)]
+#[pyclass(name = "AlertStyle", module = "comrak", from_py_object, eq, eq_int, frozen, hash)]
 pub enum PyAlertStyle {
     Specific,
     Semantic,
