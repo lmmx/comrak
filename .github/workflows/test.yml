@@ -101,8 +101,8 @@ jobs:
       - name: Build extension
         run: |
           # https://github.com/astral-sh/uv/issues/16434
-          # $(uv python find) -m maturin develop --uv
-          .venv/bin/python -m maturin develop --uv
+          # $(uv python find) -m maturin develop --uv --generate-stubs
+          .venv/bin/python -m maturin develop --uv --generate-stubs
 
       - name: Run tests
         run: |

@@ -1,6 +1,6 @@
 [dependencies]
 comrak_lib = {package = "comrak", version = "0.54.0", default-features = false, features = ["shortcodes"]}
-pyo3 = {version = "0.28.3", features = ["abi3"]}
+pyo3 = {version = "0.28.3", features = ["abi3", "experimental-inspect"]}
 
 [lib]
 name = "comrak"
@@ -17,4 +17,3 @@ lto = "thin"
 codegen-units = 1
 panic = "abort"
 debug = false
-strip = "symbols"

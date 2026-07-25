@@ -12,14 +12,14 @@ use comrak_lib::options::{
 /// A wrapper around a Python callable that implements URLRewriter.
 /// This allows Python functions to be used as URL rewriters in Comrak.
 pub struct PyURLRewriter {
-    callback: Py<PyAny>,
+    callback: Arc<Py<PyAny>>,
 }
 
 // Py<PyAny> is Send + Sync; we handle Python exceptions by returning the original URL
 impl RefUnwindSafe for PyURLRewriter {}
 
 impl PyURLRewriter {
-    pub fn new(callback: Py<PyAny>) -> Self {
+    pub fn new(callback: Arc<Py<PyAny>>) -> Self {
         Self { callback }
     }
 }
@@ -81,9 +81,7 @@ pub struct PyExtensionOptions {
     pub spoiler: bool,
     #[pyo3(get, set)]
     pub greentext: bool,
-    /// Optional callable that rewrites link URLs.
-    /// The callable should accept a URL string and return a modified URL string.
-    pub link_url_rewriter: Option<Arc<dyn URLRewriter>>,
+    pub link_url_rewriter: Option<Arc<Py<PyAny>>>,
 }
 
 impl PyExtensionOptions {
@@ -110,7 +108,10 @@ impl PyExtensionOptions {
         opts.subscript = self.subscript;
         opts.spoiler = self.spoiler;
         opts.greentext = self.greentext;
-        opts.link_url_rewriter = self.link_url_rewriter.clone();
+        opts.link_url_rewriter = self
+            .link_url_rewriter
+            .clone()
+            .map(|cb| Arc::new(PyURLRewriter::new(cb)) as Arc<dyn URLRewriter>);
     }
 }
 
@@ -141,15 +142,20 @@ impl PyExtensionOptions {
             subscript: defaults.subscript,
             spoiler: defaults.spoiler,
             greentext: defaults.greentext,
-            link_url_rewriter: defaults.link_url_rewriter.clone(),
+            link_url_rewriter: None,
         }
     }
 
-    /// Set a callable to rewrite link URLs.
+    /// Optional callable that rewrites link URLs.
     /// The callable should accept a URL string and return a modified URL string.
+    #[getter]
+    pub fn link_url_rewriter(&self, py: Python<'_>) -> Option<Py<PyAny>> {
+        self.link_url_rewriter.as_ref().map(|cb| cb.clone_ref(py))
+    }
+
     #[setter]
     pub fn set_link_url_rewriter(&mut self, callback: Option<Py<PyAny>>) {
-        self.link_url_rewriter = callback.map(|cb| Arc::new(PyURLRewriter::new(cb)) as _);
+        self.link_url_rewriter = callback.map(Arc::new);
     }
 
     #[getter]

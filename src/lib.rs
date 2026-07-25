@@ -35,15 +35,16 @@ fn render_markdown(
 }
 
 #[pymodule(gil_used = false)]
-fn comrak(m: &Bound<'_, PyModule>) -> PyResult<()> {
-    // Expose the function
-    m.add_function(wrap_pyfunction!(render_markdown, m)?)?;
+mod comrak {
+    #[pymodule_export]
+    use super::render_markdown;
 
-    // Expose the classes
-    m.add_class::<PyExtensionOptions>()?;
-    m.add_class::<PyParseOptions>()?;
-    m.add_class::<PyRenderOptions>()?;
-    m.add_class::<PyAlertStyle>()?;
-
-    Ok(())
+    #[pymodule_export]
+    use super::PyExtensionOptions;
+    #[pymodule_export]
+    use super::PyParseOptions;
+    #[pymodule_export]
+    use super::PyRenderOptions;
+    #[pymodule_export]
+    use super::PyAlertStyle;
 }
