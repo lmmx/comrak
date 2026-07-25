@@ -71,7 +71,7 @@ class TestLinkUrlRewriter:
     def test_with_header_id_prefix(self):
         """Test rewriting anchor links to match `header_id_prefix`.
 
-        When using header_ids with a prefix like "user-content-", the generated
+        When using header_id_prefix with a prefix like "user-content-", the generated
         header anchors will have that prefix. This example shows how to use
         link_url_rewriter to update anchor links written in markdown to match.
 
