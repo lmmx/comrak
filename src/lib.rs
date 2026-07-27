@@ -1,7 +1,7 @@
 use pyo3::prelude::*;
 
 // We renamed the Rust library to `comrak_lib`
-use comrak_lib::{markdown_to_html, Options as ComrakOptions};
+use comrak_lib::{markdown_to_commonmark, markdown_to_html, Options as ComrakOptions};
 
 // Import the Python option classes we defined
 mod options;
@@ -34,8 +34,36 @@ fn render_markdown(
     Ok(html)
 }
 
+/// Render a Markdown string back to normalized CommonMark, with optional Extension/Parse/Render overrides.
+#[pyfunction(signature=(text, extension_options=None, parse_options=None, render_options=None))]
+fn render_commonmark(
+    text: &str,
+    extension_options: Option<PyExtensionOptions>,
+    parse_options: Option<PyParseOptions>,
+    render_options: Option<PyRenderOptions>,
+) -> PyResult<String> {
+    let mut opts = ComrakOptions::default();
+
+    if let Some(py_ext) = extension_options {
+        py_ext.update_extension_options(&mut opts.extension);
+    }
+
+    if let Some(py_parse) = parse_options {
+        py_parse.update_parse_options(&mut opts.parse);
+    }
+
+    if let Some(py_render) = render_options {
+        py_render.update_render_options(&mut opts.render);
+    }
+
+    let cm = markdown_to_commonmark(text, &opts);
+    Ok(cm)
+}
+
 #[pymodule(gil_used = false)]
 mod comrak {
+    #[pymodule_export]
+    use super::render_commonmark;
     #[pymodule_export]
     use super::render_markdown;
 

@@ -30,6 +30,21 @@ pip install comrak
 '<h1>Hello</h1>\n'
 ```
 
+### CommonMark output
+
+`render_commonmark` renders Markdown back to normalized CommonMark instead of
+HTML. It takes the same `extension_options`/`parse_options`/`render_options`
+as `render_markdown`:
+
+```py
+>>> comrak.render_commonmark("- one\n- two\n- three")
+'- one\n- two\n- three\n'
+>>> opts = comrak.RenderOptions()
+>>> opts.list_style = comrak.ListStyle.Plus
+>>> comrak.render_commonmark("- one\n- two\n- three", render_options=opts)
+'+ one\n+ two\n+ three\n'
+```
+
 ### Options
 
 Every option in comrak's `Extension`, `Parse` and `Render` structs is exposed,
@@ -82,11 +97,14 @@ raises a `FutureWarning`; it will be removed in a future release.
 - `parse.broken_link_callback` — [see tracking issue](https://github.com/lmmx/comrak/issues/58)
 - `extension.phoenix_heex` — gated behind a comrak crate feature that isn't built here
 - Plugins (syntax highlighting, heading adapters)
+- XML output (`comrak::markdown_to_commonmark_xml`)
 
-Only HTML output is available, via `render_markdown`. The options that solely
-affect comrak's CommonMark formatter (`width`, `list_style`, `prefer_fenced`,
-`ol_width`, `experimental_minimize_commonmark`) are settable for API parity but
-currently have no effect.
+`render_markdown` renders to HTML. `render_commonmark` renders to normalized
+[CommonMark][commonmark]. The options that solely affect the CommonMark formatter (`width`,
+`list_style`, `prefer_fenced`, `ol_width`, `experimental_minimize_commonmark`)
+have no effect on `render_markdown`'s HTML output, only on `render_commonmark`.
+
+[commonmark]: https://commonmark.org/
 
 ## Benchmarks
 
