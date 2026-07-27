@@ -6,8 +6,8 @@ they need in order to be observable in HTML output:
 * toggles with a self-contained markdown/HTML signature live in a table,
   driven by ``assert_toggle`` (off -> absent, on -> present);
 * options with prerequisites or non-boolean values get their own test;
-* options that only affect non-HTML formatters are round-tripped, since
-  ``render_markdown`` cannot observe them.
+* options that only affect the CommonMark formatter are tested against
+  ``render_commonmark`` rather than ``render_markdown``.
 
 ``TestOptionCoverage`` asserts every public attribute is accounted for.
 """
@@ -539,8 +539,8 @@ RENDER_TOGGLES = [
     pytest.param("ignore_empty_links", "[](foo)", "[](foo)", id="ignore_empty_links"),
 ]
 
-#: Render options that only affect the CommonMark formatter, which
-#: ``render_markdown`` does not use. Round-tripped rather than untested.
+#: Render options that only affect the CommonMark formatter, exercised
+#: against ``render_commonmark`` in ``TestCommonmarkOutput`` below.
 COMMONMARK_ONLY_RENDER_OPTIONS = {
     "width": 80,
     "prefer_fenced": True,
@@ -554,12 +554,6 @@ class TestRenderOptions:
     @pytest.mark.parametrize(("attr", "markdown", "expected"), RENDER_TOGGLES)
     def test_toggle(self, attr, markdown, expected):
         assert_toggle("RenderOptions", attr, markdown, expected)
-
-    @pytest.mark.parametrize(
-        ("attr", "value"), sorted(COMMONMARK_ONLY_RENDER_OPTIONS.items())
-    )
-    def test_commonmark_only_round_trip(self, attr, value):
-        assert_round_trip("RenderOptions", attr, value)
 
     def test_unsafe(self):
         opts = comrak.RenderOptions()
@@ -650,6 +644,93 @@ class TestRenderOptions:
         opts.compact_html = True
         assert comrak.render_markdown(markdown, render_options=opts) == (
             "<h1>Hello</h1><p>World.</p>"
+        )
+
+
+# --------------------------------------------------------------------------
+# CommonMark output
+# --------------------------------------------------------------------------
+
+
+class TestCommonmarkOutput:
+    """``render_commonmark`` renders Markdown back to normalized CommonMark."""
+
+    def test_basic(self):
+        assert comrak.render_commonmark("hello world") == "hello world\n"
+
+    def test_width(self):
+        opts = comrak.RenderOptions()
+        markdown = "hello hello hello hello hello hello"
+
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "hello hello hello hello hello hello\n"
+        )
+
+        opts.width = 20
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "hello hello hello\nhello hello hello\n"
+        )
+
+    def test_list_style(self):
+        opts = comrak.RenderOptions()
+        markdown = "- one\n- two\n- three"
+
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "- one\n- two\n- three\n"
+        )
+
+        opts.list_style = comrak.ListStyle.Plus
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "+ one\n+ two\n+ three\n"
+        )
+
+        opts.list_style = comrak.ListStyle.Star
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "* one\n* two\n* three\n"
+        )
+
+    def test_ol_width(self):
+        opts = comrak.RenderOptions()
+        markdown = "1. Something"
+
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "1. Something\n"
+        )
+
+        opts.ol_width = 5
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "1.   Something\n"
+        )
+
+    def test_prefer_fenced(self):
+        opts = comrak.RenderOptions()
+        markdown = "```\nhello\n```\n"
+
+        assert comrak.render_commonmark(markdown, render_options=opts) == "    hello\n"
+
+        opts.prefer_fenced = True
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "```\nhello\n```\n"
+        )
+
+    def test_experimental_minimize_commonmark(self):
+        opts = comrak.RenderOptions()
+        markdown = "__hi"
+
+        assert comrak.render_commonmark(markdown, render_options=opts) == "\\_\\_hi\n"
+
+        opts.experimental_minimize_commonmark = True
+        assert comrak.render_commonmark(markdown, render_options=opts) == "__hi\n"
+
+    def test_options_are_independent_of_render_markdown(self):
+        """The same ``RenderOptions`` object drives both formatters independently."""
+        opts = comrak.RenderOptions()
+        opts.list_style = comrak.ListStyle.Plus
+        markdown = "- one\n- two"
+
+        assert "<li>one</li>" in comrak.render_markdown(markdown, render_options=opts)
+        assert comrak.render_commonmark(markdown, render_options=opts) == (
+            "+ one\n+ two\n"
         )
 
 
