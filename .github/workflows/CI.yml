@@ -52,16 +52,25 @@ jobs:
         platform:
           - runner: ubuntu-22.04
             target: x86_64
+            arch: x86_64
           - runner: ubuntu-22.04
             target: i686-unknown-linux-gnu
+            arch: x86
           - runner: ubuntu-22.04
             target: aarch64
+            arch: aarch64
           - runner: ubuntu-22.04
-            target: armv7
+            target: armv7-unknown-linux-gnueabihf
+            arch: armv7
           - runner: ubuntu-22.04
-            target: s390x
+            target: s390x-unknown-linux-gnu
+            arch: s390x
           - runner: ubuntu-22.04
-            target: ppc64le
+            target: powerpc64le-unknown-linux-gnu
+            arch: ppc64le
+          - runner: ubuntu-24.04-riscv
+            target: riscv64gc-unknown-linux-gnu
+            arch: riscv64
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -77,7 +86,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-linux-${{ matrix.platform.target }}
+          name: wheels-linux-${{ matrix.platform.arch }}
           path: dist
 
   musllinux:
@@ -87,13 +96,17 @@ jobs:
       matrix:
         platform:
           - runner: ubuntu-22.04
-            target: x86_64
+            target: x86_64-unknown-linux-musl
+            arch: x86_64
           - runner: ubuntu-22.04
-            target: i686
+            target: i686-unknown-linux-musl
+            arch: x86
           - runner: ubuntu-22.04
-            target: aarch64
+            target: aarch64-unknown-linux-musl
+            arch: aarch64
           - runner: ubuntu-22.04
-            target: armv7
+            target: armv7-unknown-linux-musleabihf
+            arch: armv7
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -109,7 +122,7 @@ jobs:
       - name: Upload wheels
         uses: actions/upload-artifact@v4
         with:
-          name: wheels-musllinux-${{ matrix.platform.target }}
+          name: wheels-musllinux-${{ matrix.platform.arch }}
           path: dist
 
   windows:
